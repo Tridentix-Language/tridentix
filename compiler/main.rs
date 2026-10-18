@@ -41,8 +41,36 @@ fn resolve_imports(program: Program, base_dir: &Path, visited: &mut HashSet<Path
     Ok(resolved)
 }
 
+fn print_help() {
+    println!("Tridentix — high-performance systems language with actor runtime\n");
+    println!("USAGE:");
+    println!("    tridentix [MODE] <PATH> [OPTIONS]\n");
+    println!("MODES:");
+    println!("    parse <file.trix>            Parse and print the AST");
+    println!("    check <file.trix>            Run typechecker and borrow checker");
+    println!("    run   <file.trix>            Check and interpret file");
+    println!("    build <file.trix>            JIT-compile via LLVM (requires --features llvm)");
+    println!("    aot   <file.trix> [OUT] [OPT] AOT-compile to native binary\n");
+    println!("OPTIONS:");
+    println!("    -h, --help                   Print help information");
+    println!("    -V, --version                Print version information");
+}
+
+fn print_version() {
+    println!("tridentix {}", env!("CARGO_PKG_VERSION"));
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
+
+    if args.iter().any(|arg| arg == "--help" || arg == "-h") {
+        print_help();
+        return;
+    }
+    if args.iter().any(|arg| arg == "--version" || arg == "-V") {
+        print_version();
+        return;
+    }
 
     let (mode, path) = match args.len() {
         1 => ("run".to_string(), "examples/hello.trix".to_string()),

@@ -585,7 +585,7 @@ impl Interpreter {
                 return Ok(Value::Tensor { data, shape: vec![len] });
             }
             "tensor.zeros" => {
-                let shape = match args.get(0) {
+                let shape = match args.first() {
                     Some(Value::List(items)) => {
                         items.iter().map(|v| v.as_int().map(|n| n as usize)).collect::<RResult<Vec<_>>>()?
                     }
@@ -599,14 +599,14 @@ impl Interpreter {
                 return Ok(Value::Tensor { data: vec![0.0; total], shape });
             }
             "tensor.sum" => {
-                if let Some(Value::Tensor { data, .. }) = args.get(0) {
+                if let Some(Value::Tensor { data, .. }) = args.first() {
                     return Ok(Value::Float(data.iter().sum()));
                 }
                 return Err(RuntimeError::TypeError("tensor.sum expects a tensor".into()));
             }
             // Stdlib helpers
             "len" => {
-                return Ok(match args.get(0) {
+                return Ok(match args.first() {
                     Some(Value::Str(s)) => Value::Int(s.chars().count() as i64),
                     Some(Value::List(items)) => Value::Int(items.len() as i64),
                     Some(Value::Tensor { data, .. }) => Value::Int(data.len() as i64),
@@ -617,19 +617,19 @@ impl Interpreter {
                 });
             }
             "str_upper" => {
-                return Ok(match args.get(0) {
+                return Ok(match args.first() {
                     Some(Value::Str(s)) => Value::Str(s.to_uppercase()),
                     _ => return Err(RuntimeError::TypeError("str_upper() expects a string".into())),
                 });
             }
             "str_lower" => {
-                return Ok(match args.get(0) {
+                return Ok(match args.first() {
                     Some(Value::Str(s)) => Value::Str(s.to_lowercase()),
                     _ => return Err(RuntimeError::TypeError("str_lower() expects a string".into())),
                 });
             }
             "str_split" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Str(s)), Some(Value::Str(sep))) => {
                         let parts: Vec<Value> = s.split(sep.as_str()).map(|p| Value::Str(p.to_string())).collect();
                         Ok(Value::List(parts))
@@ -638,26 +638,26 @@ impl Interpreter {
                 };
             }
             "str_trim" => {
-                return Ok(match args.get(0) {
+                return Ok(match args.first() {
                     Some(Value::Str(s)) => Value::Str(s.trim().to_string()),
                     _ => return Err(RuntimeError::TypeError("str_trim() expects a string".into())),
                 });
             }
             "str_contains" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Str(s)), Some(Value::Str(needle))) => Ok(Value::Bool(s.contains(needle.as_str()))),
                     _ => Err(RuntimeError::TypeError("str_contains() expects (string, string)".into())),
                 };
             }
             "int_to_str" => {
-                return Ok(match args.get(0) {
+                return Ok(match args.first() {
                     Some(Value::Int(n)) => Value::Str(n.to_string()),
                     Some(Value::Float(f)) => Value::Str(f.to_string()),
                     _ => return Err(RuntimeError::TypeError("int_to_str() expects a number".into())),
                 });
             }
             "str_to_int" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Str(s)) => s
                         .trim()
                         .parse::<i64>()
@@ -667,7 +667,7 @@ impl Interpreter {
                 };
             }
             "list_push" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::List(items)) => {
                         let mut new_items = items.clone();
                         if let Some(v) = args.get(1) {
@@ -679,7 +679,7 @@ impl Interpreter {
                 };
             }
             "list_get" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::List(items)), Some(Value::Int(idx))) => {
                         let i = *idx;
                         if i < 0 || i as usize >= items.len() {
@@ -695,7 +695,7 @@ impl Interpreter {
                 };
             }
             "range_list" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Int(start)), Some(Value::Int(end))) => {
                         Ok(Value::List((*start..*end).map(Value::Int).collect()))
                     }
@@ -704,55 +704,55 @@ impl Interpreter {
             }
             // Native stdlib (see stdlib.rs)
             "file_read" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Str(path)) => crate::stdlib::file_read(path),
                     _ => Err(RuntimeError::TypeError("file_read() expects a string path".into())),
                 };
             }
             "file_write" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Str(path)), Some(Value::Str(content))) => crate::stdlib::file_write(path, content),
                     _ => Err(RuntimeError::TypeError("file_write() expects (string path, string content)".into())),
                 };
             }
             "file_append" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Str(path)), Some(Value::Str(content))) => crate::stdlib::file_append(path, content),
                     _ => Err(RuntimeError::TypeError("file_append() expects (string path, string content)".into())),
                 };
             }
             "file_exists" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Str(path)) => Ok(crate::stdlib::file_exists(path)),
                     _ => Err(RuntimeError::TypeError("file_exists() expects a string path".into())),
                 };
             }
             "json_stringify" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(v) => crate::stdlib::json_stringify(v),
                     None => Err(RuntimeError::ArityMismatch { name: "json_stringify".into(), expected: 1, got: 0 }),
                 };
             }
             "json_parse" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Str(s)) => crate::stdlib::json_parse(s),
                     _ => Err(RuntimeError::TypeError("json_parse() expects a string".into())),
                 };
             }
             "regex_match" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Str(pat)), Some(Value::Str(text))) => crate::stdlib::regex_match(pat, text),
                     _ => Err(RuntimeError::TypeError("regex_match() expects (string pattern, string text)".into())),
                 };
             }
             "regex_find" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Str(pat)), Some(Value::Str(text))) => crate::stdlib::regex_find(pat, text),
                     _ => Err(RuntimeError::TypeError("regex_find() expects (string pattern, string text)".into())),
                 };
             }
             "regex_replace" => {
-                return match (args.get(0), args.get(1), args.get(2)) {
+                return match (args.first(), args.get(1), args.get(2)) {
                     (Some(Value::Str(pat)), Some(Value::Str(text)), Some(Value::Str(repl))) => {
                         crate::stdlib::regex_replace(pat, text, repl)
                     }
@@ -762,7 +762,7 @@ impl Interpreter {
                 };
             }
             "net_tcp_send" => {
-                return match (args.get(0), args.get(1), args.get(2)) {
+                return match (args.first(), args.get(1), args.get(2)) {
                     (Some(Value::Str(host)), Some(Value::Int(port)), Some(Value::Str(msg))) => {
                         crate::stdlib::net_tcp_send(host, *port, msg)
                     }
@@ -772,7 +772,7 @@ impl Interpreter {
                 };
             }
             "enum_tag" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Enum(type_name, variant, _)) => {
                         match self.runtime.globals.enums.get(type_name) {
                             Some(variant_order) => variant_order
@@ -795,7 +795,7 @@ impl Interpreter {
                 };
             }
             "assert" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Bool(true)), _) => Ok(Value::Unit),
                     (Some(Value::Bool(false)), Some(Value::Str(msg))) => {
                         Err(RuntimeError::UserRaised(Value::Str(format!("assertion failed: {}", msg))))
@@ -810,7 +810,7 @@ impl Interpreter {
                 return Ok(Value::Map(std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))));
             }
             "map_set" => {
-                return match (args.get(0), args.get(1), args.get(2)) {
+                return match (args.first(), args.get(1), args.get(2)) {
                     (Some(Value::Map(m)), Some(Value::Str(k)), Some(v)) => {
                         m.lock().unwrap().insert(k.clone(), v.clone());
                         Ok(Value::Map(m.clone())) // same underlying map (Arc share), returned for chaining
@@ -819,7 +819,7 @@ impl Interpreter {
                 };
             }
             "map_get" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Map(m)), Some(Value::Str(k))) => {
                         Ok(m.lock().unwrap().get(k).cloned().unwrap_or(Value::Unit))
                     }
@@ -827,13 +827,13 @@ impl Interpreter {
                 };
             }
             "map_has" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Map(m)), Some(Value::Str(k))) => Ok(Value::Bool(m.lock().unwrap().contains_key(k))),
                     _ => Err(RuntimeError::TypeError("map_has() expects (map, string key)".into())),
                 };
             }
             "map_delete" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Map(m)), Some(Value::Str(k))) => {
                         let removed = m.lock().unwrap().remove(k).is_some();
                         Ok(Value::Bool(removed))
@@ -842,7 +842,7 @@ impl Interpreter {
                 };
             }
             "map_keys" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Map(m)) => {
                         Ok(Value::List(m.lock().unwrap().keys().map(|k| Value::Str(k.clone())).collect()))
                     }
@@ -850,13 +850,13 @@ impl Interpreter {
                 };
             }
             "map_len" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Map(m)) => Ok(Value::Int(m.lock().unwrap().len() as i64)),
                     _ => Err(RuntimeError::TypeError("map_len() expects a map".into())),
                 };
             }
             "env_get" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Str(k)) => Ok(match std::env::var(k) {
                         Ok(v) => Value::Enum("Option".into(), "Some".into(), vec![Value::Str(v)]),
                         Err(_) => Value::Enum("Option".into(), "None".into(), vec![]),
@@ -865,7 +865,7 @@ impl Interpreter {
                 };
             }
             "env_set" => {
-                return match (args.get(0), args.get(1)) {
+                return match (args.first(), args.get(1)) {
                     (Some(Value::Str(k)), Some(Value::Str(v))) => {
                         std::env::set_var(k, v);
                         Ok(Value::Unit)
@@ -877,7 +877,7 @@ impl Interpreter {
                 return Ok(Value::List(std::env::args().skip(1).map(Value::Str).collect()));
             }
             "process_exit" => {
-                let code = match args.get(0) {
+                let code = match args.first() {
                     Some(Value::Int(n)) => *n as i32,
                     _ => 0,
                 };
@@ -885,7 +885,7 @@ impl Interpreter {
                 std::process::exit(code);
             }
             "process_run" => {
-                return match args.get(0) {
+                return match args.first() {
                     Some(Value::Str(cmd)) => {
                         let cmd_args: Vec<String> = match args.get(1) {
                             Some(Value::List(items)) => items
@@ -907,7 +907,7 @@ impl Interpreter {
                 };
             }
             "udp_send" => {
-                return match (args.get(0), args.get(1), args.get(2)) {
+                return match (args.first(), args.get(1), args.get(2)) {
                     (Some(Value::Str(host)), Some(Value::Int(port)), Some(Value::Str(msg))) => {
                         crate::stdlib::udp_send(host, *port, msg)
                     }
@@ -915,7 +915,7 @@ impl Interpreter {
                 };
             }
             "http_get" => {
-                return match (args.get(0), args.get(1), args.get(2)) {
+                return match (args.first(), args.get(1), args.get(2)) {
                     (Some(Value::Str(host)), Some(Value::Int(port)), Some(Value::Str(path))) => {
                         crate::stdlib::http_get(host, *port, path)
                     }
@@ -923,7 +923,7 @@ impl Interpreter {
                 };
             }
             "http_post" => {
-                return match (args.get(0), args.get(1), args.get(2), args.get(3)) {
+                return match (args.first(), args.get(1), args.get(2), args.get(3)) {
                     (Some(Value::Str(host)), Some(Value::Int(port)), Some(Value::Str(path)), Some(Value::Str(body))) => {
                         crate::stdlib::http_post(host, *port, path, body)
                     }
@@ -933,7 +933,7 @@ impl Interpreter {
                 };
             }
             "http_serve" => {
-                return match (args.get(0), args.get(1), args.get(2)) {
+                return match (args.first(), args.get(1), args.get(2)) {
                     (Some(Value::Int(port)), Some(Value::Closure(handler)), Some(Value::Int(max_requests))) => {
                         self.http_serve(*port as u16, handler.clone(), *max_requests as usize)
                     }
@@ -943,7 +943,7 @@ impl Interpreter {
                 };
             }
             "net_tcp_send_to_actor" => {
-                return match (args.get(0), args.get(1), args.get(2), args.get(3)) {
+                return match (args.first(), args.get(1), args.get(2), args.get(3)) {
                     (Some(Value::ActorHandle(id)), Some(Value::Str(host)), Some(Value::Int(port)), Some(Value::Str(msg))) => {
                         self.net_tcp_send_to_actor(*id, host.clone(), *port, msg.clone())
                     }
@@ -991,7 +991,7 @@ impl Interpreter {
 
         self.call_depth += 1;
         self.push_scope();
-        for (pname, pval) in fn_def.params.iter().zip(args.into_iter()) {
+        for (pname, pval) in fn_def.params.iter().zip(args) {
             self.define(pname, pval);
         }
         let flow = self.exec_block(&fn_def.body);
@@ -1025,7 +1025,7 @@ impl Interpreter {
         // Evaluate in the captured environment, then restore caller scopes.
         let caller_scopes = std::mem::replace(&mut self.scopes, closure.captured_env.clone());
         self.push_scope();
-        for (pname, pval) in closure.params.iter().zip(args.into_iter()) {
+        for (pname, pval) in closure.params.iter().zip(args) {
             self.define(pname, pval);
         }
         self.call_depth += 1;
@@ -1177,17 +1177,20 @@ impl Interpreter {
         let children_owned: Vec<crate::ast::SupervisedChild> = children.to_vec();
         let coordinator_runtime = Arc::clone(&self.runtime);
 
+        let config = SupervisorConfig {
+            sup_name: sup_name_owned,
+            strategy,
+            max_restarts,
+            time_window_secs,
+            children: children_owned,
+            child_ids,
+        };
         let coordinator = thread::Builder::new()
             .stack_size(tridentix_rt_mailbox::actor_stack_size())
             .spawn(move || {
                 run_supervisor_coordinator(
                     coordinator_runtime,
-                    sup_name_owned,
-                    strategy,
-                    max_restarts,
-                    time_window_secs,
-                    children_owned,
-                    child_ids,
+                    config,
                     coordinator_events_tx,
                     events_rx,
                 );
@@ -1198,6 +1201,16 @@ impl Interpreter {
         Ok(bindings)
     }
 
+}
+
+/// Supervisor configuration passed to coordinator thread.
+struct SupervisorConfig {
+    sup_name: String,
+    strategy: RestartStrategy,
+    max_restarts: i64,
+    time_window_secs: i64,
+    children: Vec<crate::ast::SupervisedChild>,
+    child_ids: Vec<usize>,
 }
 
 /// Shared actor receive loop (`events = None` is unsupervised / self-healing).
@@ -1259,15 +1272,18 @@ fn run_actor_worker(
 /// Supervisor coordinator: restart strategy, crash events, shutdown.
 fn run_supervisor_coordinator(
     runtime: Arc<RuntimeShared>,
-    sup_name: String,
-    strategy: RestartStrategy,
-    max_restarts: i64,
-    time_window_secs: i64,
-    children: Vec<crate::ast::SupervisedChild>,
-    mut child_ids: Vec<usize>,
+    config: SupervisorConfig,
     events_tx: Sender<SupervisorEvent>,
     events_rx: Receiver<SupervisorEvent>,
 ) {
+    let SupervisorConfig {
+        sup_name,
+        strategy,
+        max_restarts,
+        time_window_secs,
+        children,
+        mut child_ids,
+    } = config;
     let n = children.len();
     let mut done = vec![false; n];
     let mut given_up = vec![false; n];
@@ -1460,9 +1476,7 @@ fn eval_binop(l: &Value, op: &BinOp, r: &Value) -> RResult<Value> {
             GtEq => Value::Bool(a >= b),
             Add => unreachable!("Add on two strings handled above"),
             Sub | Mul | Div => {
-                return Err(RuntimeError::TypeError(format!(
-                    "operator not supported between two strings"
-                )))
+                return Err(RuntimeError::TypeError("operator not supported between two strings".to_string()))
             }
         });
     }

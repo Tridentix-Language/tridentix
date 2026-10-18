@@ -42,7 +42,7 @@ impl<T: Send> MailboxTable<T> {
         }
     }
 
-    fn chunk<'a>(chunks: &'a [OnceLock<Chunk<T>>], id: usize) -> Option<&'a Chunk<T>> {
+    fn chunk(chunks: &[OnceLock<Chunk<T>>], id: usize) -> Option<&Chunk<T>> {
         chunks.get(id / CHUNK).and_then(|c| c.get())
     }
 

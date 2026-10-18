@@ -4,7 +4,7 @@ pub mod mailbox;
 pub mod scheduler;
 pub mod supervisor;
 
-pub use mailbox::{channel, MailboxTable, ACTOR_STACK, MAILBOX_BOUND};
+pub use mailbox::{channel, MailboxTable, SendStatus, ACTOR_STACK, MAILBOX_BOUND};
 pub use scheduler::Scheduler;
 pub use supervisor::{restart_set, RestartBudget, RestartStrategy};
 
@@ -62,7 +62,7 @@ pub extern "C" fn tridentix_rt_send(actor_id: i64, payload: i64) {
     if actor_id < 0 {
         return;
     }
-    mailboxes().send(actor_id as usize, payload);
+    let _ = mailboxes().send(actor_id as usize, payload);
 }
 
 #[no_mangle]

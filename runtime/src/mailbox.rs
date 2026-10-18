@@ -35,6 +35,19 @@ pub struct MailboxTable<T: Send> {
     chunks: RwLock<Vec<OnceLock<Chunk<T>>>>,
 }
 
+/// Delivery status returned by non-blocking mailbox send operations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SendStatus {
+    /// Message successfully enqueued in target actor mailbox.
+    Delivered,
+    /// Target mailbox is full (capacity bound reached).
+    Full,
+    /// Target actor receiver disconnected / terminated.
+    Disconnected,
+    /// No actor registered with the given identifier.
+    NoSuchActor,
+}
+
 impl<T: Send> MailboxTable<T> {
     pub fn new() -> Self {
         MailboxTable {
@@ -69,10 +82,10 @@ impl<T: Send> MailboxTable<T> {
         *chunk.slots[id % CHUNK].lock().unwrap() = Some(tx);
     }
 
-    pub fn send(&self, id: usize, msg: T) {
+    pub fn send(&self, id: usize, msg: T) -> SendStatus {
         let g = self.chunks.read().unwrap();
         let Some(chunk) = Self::chunk(&g, id) else {
-            return;
+            return SendStatus::NoSuchActor;
         };
         let tx = {
             let slot = chunk.slots[id % CHUNK].lock().unwrap();
@@ -81,11 +94,12 @@ impl<T: Send> MailboxTable<T> {
         drop(g);
         if let Some(tx) = tx {
             match tx.try_send(msg) {
-                Ok(()) | Err(TrySendError::Disconnected(_)) => {}
-                Err(TrySendError::Full(msg)) => {
-                    let _ = msg;
-                }
+                Ok(()) => SendStatus::Delivered,
+                Err(TrySendError::Disconnected(_)) => SendStatus::Disconnected,
+                Err(TrySendError::Full(_)) => SendStatus::Full,
             }
+        } else {
+            SendStatus::NoSuchActor
         }
     }
 

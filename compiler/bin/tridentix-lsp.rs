@@ -184,6 +184,21 @@ impl Backend {
 
 #[tokio::main]
 async fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.iter().any(|arg| arg == "--help" || arg == "-h") {
+        println!("tridentix-lsp — Language Server Protocol daemon for Tridentix\n");
+        println!("USAGE:");
+        println!("    tridentix-lsp [OPTIONS]\n");
+        println!("OPTIONS:");
+        println!("    -h, --help       Print help information");
+        println!("    -V, --version    Print version information");
+        return;
+    }
+    if args.iter().any(|arg| arg == "--version" || arg == "-V") {
+        println!("tridentix-lsp {}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+
     let stdin = tokio::io::stdin();
     let stdout = tokio::io::stdout();
 

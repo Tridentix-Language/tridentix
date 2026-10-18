@@ -2,6 +2,7 @@
 
 pub mod ast;
 pub mod borrow_checker;
+pub mod cli;
 #[cfg(feature = "llvm")]
 pub mod codegen;
 #[cfg(not(feature = "llvm"))]

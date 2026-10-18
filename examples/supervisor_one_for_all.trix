@@ -1,0 +1,37 @@
+# one_for_all demo: TWO children under one supervisor. When w1 crashes,
+# BOTH w1 and w2 should be restarted (Compiler doc §2.2 table).
+
+actor Echo:
+    on receive(msg):
+        if msg == "crash":
+            let bad_tensor = tensor([9.0])
+            let boom = bad_tensor + 1
+            print(boom)
+        else:
+            print("echo:")
+            print(msg)
+
+fn main():
+    supervisor Root:
+        strategy = one_for_all
+        max_restarts = 2
+        time_window = 60
+        children:
+            spawn Echo() as w1
+            spawn Echo() as w2
+
+    send(w1, "from w1")
+    send(w2, "from w2")
+    send(w1, "crash")
+
+    let mut busy = 0
+    loop i in range(0, 300000):
+        busy = busy + 1
+
+    send(w1, "w1 after restart")
+    send(w2, "w2 after restart")
+
+    loop i in range(0, 300000):
+        busy = busy + 1
+
+    print("main: done")

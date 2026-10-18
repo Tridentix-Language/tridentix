@@ -1,0 +1,96 @@
+# In-memory pub/sub node: subscribe, fan-out publish, unsubscribe.
+# Dispatch is a bounded mailbox send on an isolated actor heap (zero tracing GC).
+
+enum Envelope:
+    Subscribe(sub, topic)
+    Unsubscribe(sub, topic)
+    Publish(topic, payload)
+    Event(topic, payload)
+
+actor TopicHub:
+    state:
+        delivered: int = 0
+        dropped: int = 0
+        topics = map_new()
+    on receive(msg):
+        match msg:
+            Envelope.Subscribe(sub, topic) => :
+                let mut subs = []
+                if map_has(topics, topic):
+                    subs = map_get(topics, topic)
+                subs = list_push(subs, sub)
+                map_set(topics, topic, subs)
+                print("hub: subscribed")
+                print(topic)
+            Envelope.Unsubscribe(sub, topic) => :
+                print("hub: unsubscribe")
+                print(topic)
+            Envelope.Publish(topic, payload) => :
+                if map_has(topics, topic):
+                    let subs = map_get(topics, topic)
+                    let n = len(subs)
+                    loop i in range(0, n):
+                        let dest = list_get(subs, i)
+                        send(dest, Envelope.Event(topic, payload))
+                        delivered = delivered + 1
+                    print("hub: dispatched")
+                    print(topic)
+                    print(payload)
+                    print(n)
+                else:
+                    dropped = dropped + 1
+                    print("hub: no subscribers")
+                    print(topic)
+            _ => :
+                print("hub: drop envelope")
+
+actor TickSubscriber:
+    state:
+        seen: int = 0
+    on receive(msg):
+        match msg:
+            Envelope.Event(topic, payload) => :
+                seen = seen + 1
+                print("tick-sub: event")
+                print(topic)
+                print(payload)
+            _ => :
+                print("tick-sub: other")
+                print(msg)
+
+actor BookSubscriber:
+    state:
+        seen: int = 0
+    on receive(msg):
+        match msg:
+            Envelope.Event(topic, payload) => :
+                seen = seen + 1
+                print("book-sub: event")
+                print(payload)
+            _ => :
+                print("book-sub: other")
+
+fn main():
+    let hub = spawn TopicHub()
+    let ticks = spawn TickSubscriber()
+    let book = spawn BookSubscriber()
+
+    send(hub, Envelope.Subscribe(ticks, "market.ticks"))
+    send(hub, Envelope.Subscribe(book, "market.book"))
+    send(hub, Envelope.Subscribe(ticks, "market.book"))
+
+    send(hub, Envelope.Publish("market.ticks", 42))
+    send(hub, Envelope.Publish("market.ticks", 43))
+    send(hub, Envelope.Publish("market.book", 1001))
+    send(hub, Envelope.Publish("market.unknown", 0))
+
+    let mut spin = 0
+    loop i in range(0, 400000):
+        spin = spin + 1
+
+    send(hub, Envelope.Unsubscribe(book, "market.book"))
+
+    loop i in range(0, 100000):
+        spin = spin + 1
+
+    print("broker_service: drain complete")

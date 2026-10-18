@@ -1,0 +1,14 @@
+fn main() -> int:
+    let add_ten = fn(x: int) => x + 10
+    let a = add_ten(5)
+    print(a)
+
+    let captured = 100
+    let uses_capture = fn(x: int) => x + captured
+    let b = uses_capture(1)
+    print(b)
+
+    let doubled = add_ten(add_ten(1))
+    print(doubled)
+
+    return a + b + doubled

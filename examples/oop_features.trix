@@ -1,0 +1,43 @@
+struct Point:
+    x: int
+    y: int
+
+enum Shape:
+    Circle(radius)
+    Rectangle(width, height)
+    Origin
+
+fn area(s: int) -> int:
+    return s
+
+fn apply_twice(f, x: int) -> int:
+    let once = f(x)
+    return f(once)
+
+fn main():
+    # structs: construction + field access + reference semantics
+    let p = Point { x: 3, y: 4 }
+    print(p.x)
+    print(p.y)
+    print(p)
+
+    # enums: variant construction with payload
+    let c = Shape.Circle(5)
+    let r = Shape.Rectangle(2, 3)
+    let o = Shape.Origin
+    print(c)
+    print(r)
+    print(o)
+
+    # closures: capture + higher-order function
+    let add_ten = fn(x: int) => x + 10
+    print(add_ten(5))
+
+    let result = apply_twice(add_ten, 1)
+    print(result)
+
+    let captured = 100
+    let uses_capture = fn(x: int) => x + captured
+    print(uses_capture(1))
+
+    print("structs, enums, closures all worked")

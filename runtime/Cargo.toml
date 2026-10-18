@@ -1,0 +1,11 @@
+[package]
+name = "tridentix-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Zero-GC actor scheduler, bounded MPSC mailbox, and supervisor recovery"
+
+[lib]
+name = "tridentix_actor_rt"
+path = "src/lib.rs"
+crate-type = ["rlib", "staticlib"]

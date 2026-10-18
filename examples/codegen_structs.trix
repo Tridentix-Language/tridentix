@@ -1,0 +1,28 @@
+struct Point:
+    x: int
+    y: int
+
+struct Vec2:
+    x: float
+    y: float
+
+fn manhattan_distance(p: int) -> int:
+    return p
+
+fn main() -> int:
+    let p1 = Point { x: 3, y: 4 }
+    let p2 = Point { x: 10, y: 20 }
+
+    let sum_x = p1.x + p2.x
+    let sum_y = p1.y + p2.y
+
+    print(p1.x)
+    print(p1.y)
+    print(sum_x)
+    print(sum_y)
+
+    let v = Vec2 { x: 1.5, y: 2.5 }
+    let total = v.x + v.y
+    print(total)
+
+    return sum_x + sum_y

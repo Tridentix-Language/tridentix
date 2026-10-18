@@ -1,0 +1,30 @@
+struct Point:
+    x: int
+    y: int
+
+fn main():
+    # List indexing (read)
+    let nums = range_list(0, 5)
+    print(nums[0])
+    print(nums[2])
+    print(nums[4])
+
+    # List index assignment (write)
+    nums[2] = 999
+    print(nums[2])
+    print(nums[0])
+
+    # Struct field mutation (real reference semantics — Arc<Mutex<>>)
+    let p = Point { x: 1, y: 2 }
+    print(p.x)
+    p.x = 100
+    print(p.x)
+    print(p.y)
+
+    # Reference semantics check: does p2 (same reference) see the mutation?
+    let p2 = p
+    p2.y = 500
+    print(p.y)
+    print(p2.y)
+
+    print("indexing and field mutation all worked")

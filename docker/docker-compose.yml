@@ -1,0 +1,12 @@
+services:
+  tridentix:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: tridentix:llvm20
+    working_dir: /src
+    environment:
+      LLVM_SYS_201_PREFIX: /usr/lib/llvm-20
+    volumes:
+      - ..:/src
+    command: ["cargo", "test", "--release", "--workspace"]

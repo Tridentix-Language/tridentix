@@ -1,0 +1,9 @@
+# HTTP server whose response logic is written IN Tridentix (a closure).
+# Bounded to 2 requests so this script doesn't hang forever.
+
+fn main():
+    let handler = fn(method: string, path: string) => "Hello from Tridentix! You requested: " + path
+
+    print("starting server...")
+    let handled = http_serve(8877, handler, 2)
+    print(handled)

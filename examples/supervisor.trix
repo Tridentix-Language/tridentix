@@ -1,0 +1,45 @@
+# Supervisor demo — exercises `supervisor`, restart strategies, and
+# crash recovery (Compiler doc §2.2-§2.3). `Crash()` messages trigger a
+# runtime error inside the handler (division by zero via undefined var
+# access) which the supervisor should detect and restart the actor for.
+
+actor Worker:
+    on receive(msg):
+        if msg == "crash":
+            # Adding a tensor and an int is a genuine RUNTIME type error
+            # (eval_binop can't statically be caught by the type checker,
+            # since it doesn't track tensor-vs-int per call site yet —
+            # see typechecker.rs's documented gaps). This lets us safely
+            # demonstrate crash -> supervisor restart without the type
+            # checker refusing to run the program up front.
+            let bad_tensor = tensor([1.0, 2.0])
+            let boom = bad_tensor + 1
+            print(boom)
+        else:
+            print("worker handled:")
+            print(msg)
+
+fn main():
+    supervisor RootSupervisor:
+        strategy = one_for_one
+        max_restarts = 3
+        time_window = 60
+        children:
+            spawn Worker() as w1
+
+    send(w1, "hello")
+    send(w1, "crash")
+
+    # No sleep() builtin yet (documented gap) — burn a few CPU cycles so
+    # the OS scheduler gives the worker/coordinator threads a turn before
+    # main() returns and shutdown_actors() races ahead of the restart.
+    let mut busy = 0
+    loop i in range(0, 300000):
+        busy = busy + 1
+
+    send(w1, "still alive after restart?")
+
+    loop i in range(0, 300000):
+        busy = busy + 1
+
+    print("main: done sending")

@@ -1,0 +1,24 @@
+fn main():
+    let s = "  Hello World  "
+    print(str_trim(s))
+    print(str_upper(str_trim(s)))
+    print(str_lower(str_trim(s)))
+    print(len(s))
+    print(str_contains(s, "World"))
+
+    let parts = str_split("a,b,c", ",")
+    print(len(parts))
+    print(list_get(parts, 0))
+    print(list_get(parts, 2))
+
+    let n = str_to_int("42")
+    print(n)
+    print(int_to_str(99))
+
+    let r = range_list(0, 5)
+    print(len(r))
+    print(list_get(r, 3))
+
+    let l = list_push(r, 100)
+    print(len(l))
+    print(list_get(l, 5))

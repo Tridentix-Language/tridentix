@@ -1,0 +1,42 @@
+fn main():
+    # HashMap
+    let m = map_new()
+    map_set(m, "name", "Alice")
+    map_set(m, "age", 30)
+    print(map_get(m, "name"))
+    print(map_get(m, "age"))
+    print(map_has(m, "name"))
+    print(map_has(m, "missing"))
+    print(map_len(m))
+    map_delete(m, "age")
+    print(map_len(m))
+
+    # Option/Result prelude (no explicit enum declaration needed)
+    let found = env_get("PATH")
+    match found:
+        Option.Some(v) => :
+            print("PATH is set")
+        Option.None => :
+            print("PATH is not set")
+
+    let missing = env_get("DEFINITELY_NOT_A_REAL_VAR_12345")
+    match missing:
+        Option.Some(v) => :
+            print("should not happen")
+        Option.None => :
+            print("correctly got None for missing env var")
+
+    env_set("Tridentix_TEST_VAR", "hello")
+    let after_set = env_get("Tridentix_TEST_VAR")
+    match after_set:
+        Option.Some(v) => :
+            print(v)
+        Option.None => :
+            print("should not happen")
+
+    # Process management
+    let result = process_run("echo", ["hello from subprocess"])
+    print(result.stdout)
+    print(result.exit_code)
+
+    print("Phase 2 core tests passed")

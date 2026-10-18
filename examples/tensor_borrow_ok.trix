@@ -1,0 +1,9 @@
+fn inspect(t: tensor) -> int:
+    return 1
+
+fn main():
+    let a = tensor([1.0, 2.0, 3.0])
+    let b = inspect(borrow(a))
+    let c = inspect(borrow(a))
+    let owner2 = a
+    print("all good, no false positives")

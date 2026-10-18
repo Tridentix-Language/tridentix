@@ -1,0 +1,28 @@
+struct Person:
+    name: string
+    age: int
+
+fn main():
+    # File I/O
+    let ok = file_write("/tmp/Tridentix_test.txt", "Hello from Tridentix!")
+    print(ok)
+    print(file_exists("/tmp/Tridentix_test.txt"))
+    let content = file_read("/tmp/Tridentix_test.txt")
+    print(content)
+    file_append("/tmp/Tridentix_test.txt", " Appended text.")
+    print(file_read("/tmp/Tridentix_test.txt"))
+
+    # JSON
+    let p = Person { name: "Alice", age: 30 }
+    let json = json_stringify(p)
+    print(json)
+    let parsed = json_parse("{\"x\": 1, \"y\": 2}")
+    print(parsed)
+
+    # Regex
+    print(regex_match("^[0-9]+$", "12345"))
+    print(regex_match("^[0-9]+$", "abc123"))
+    print(regex_find("[0-9]+", "order number 4521 confirmed"))
+    print(regex_replace("[0-9]+", "call 555-1234 now", "XXX"))
+
+    print("stdlib I/O all worked")

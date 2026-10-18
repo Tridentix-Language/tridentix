@@ -1,0 +1,16 @@
+fn inspect(t: tensor) -> int:
+    return 1
+
+fn main():
+    let a = tensor([1.0, 2.0])
+
+    if true:
+        let r1 = borrow(a)
+        let r2 = borrow(a)
+        let x = inspect(r1)
+        let y = inspect(r2)
+        print("two immutable borrows coexisted fine")
+
+    # r1/r2 scope ended above, so `a` is free to move now.
+    let owner2 = a
+    print("move after borrows ended: fine")

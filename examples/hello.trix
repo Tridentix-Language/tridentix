@@ -1,0 +1,22 @@
+# Sample Tridentix program — exercises the Phase 1 grammar subset:
+# fn, let, if/elif/else, loop..in range(), print, comments.
+
+fn classify(n: int) -> string:
+    if n < 0:
+        return "negative"
+    elif n == 0:
+        return "zero"
+    else:
+        return "positive"
+
+fn main():
+    let greeting: string = "Hello, Tridentix!"
+    print(greeting)
+
+    let mut total = 0
+    loop i in range(0, 5):
+        total = total + i
+        print(i)
+
+    let label = classify(total)
+    print(label)

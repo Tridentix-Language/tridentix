@@ -1,0 +1,24 @@
+actor Counter:
+    state:
+        count: int = 0
+        total_received: int = 0
+
+    on receive(msg):
+        count = count + msg
+        total_received = total_received + 1
+        print("count is now:")
+        print(count)
+        print("messages received so far:")
+        print(total_received)
+
+fn main():
+    let c = spawn Counter()
+    send(c, 1)
+    send(c, 10)
+    send(c, 100)
+
+    let mut busy = 0
+    loop i in range(0, 400000):
+        busy = busy + 1
+
+    print("main done sending")

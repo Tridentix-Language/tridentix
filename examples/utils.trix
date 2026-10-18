@@ -1,0 +1,7 @@
+# Shared helper functions — imported by other .Tridentix files.
+
+fn double(x: int) -> int:
+    return x * 2
+
+fn greet(name: string):
+    print("Hello from utils.Tridentix!")

@@ -1,0 +1,5 @@
+fn main():
+    let a = tensor([1.0, 2.0])
+    let r1 = borrow(a)
+    let b = a
+    print("should not reach here")

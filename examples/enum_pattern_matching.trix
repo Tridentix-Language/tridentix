@@ -1,0 +1,25 @@
+enum Shape:
+    Circle(radius)
+    Rectangle(width, height)
+    Origin
+
+fn main():
+    let shapes = [Shape.Circle(5), Shape.Rectangle(3, 4), Shape.Origin]
+
+    loop i in range(0, 3):
+        let shape = list_get(shapes, i)
+        match shape:
+            Shape.Circle(r) => :
+                print("Circle with radius:")
+                print(r)
+            Shape.Rectangle(w, h) => :
+                print("Rectangle:")
+                print(w)
+                print(h)
+                print(w * h)
+            Shape.Origin => :
+                print("Just the origin point")
+            _ => :
+                print("unknown shape")
+
+    print("real pattern matching with binding worked")

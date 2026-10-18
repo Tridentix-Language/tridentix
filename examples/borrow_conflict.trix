@@ -1,0 +1,11 @@
+fn mutate(t: tensor) -> int:
+    return 1
+
+fn inspect(t: tensor) -> int:
+    return 1
+
+fn main():
+    let a = tensor([1.0, 2.0])
+    let r1 = borrow(a)
+    let r2 = borrow_mut(a)
+    print("should not reach here")

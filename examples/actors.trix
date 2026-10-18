@@ -1,0 +1,24 @@
+# Actor demo — exercises `actor`, `spawn`, `send`, and message-tag
+# constructors (e.g. `Greet("...")`). Each actor runs on its own thread
+# with its own isolated mailbox (Compiler doc §2, §3).
+
+actor Greeter:
+    on receive(msg):
+        print("Greeter got:")
+        print(msg)
+
+actor Doubler:
+    on receive(n: Num):
+        print("Doubler received a number")
+
+fn main():
+    let g = spawn Greeter()
+    send(g, Greet("hello from main"))
+    send(g, "a plain string message works too")
+
+    let d = spawn Doubler()
+    let mut i = 0
+    loop i in range(0, 3):
+        send(d, Num(i))
+
+    print("main: all messages sent")

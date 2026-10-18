@@ -1,0 +1,33 @@
+fn avg(a: float, b: float) -> float:
+    return (a + b) / 2.0
+
+fn square(x: float) -> float:
+    return x * x
+
+fn main() -> int:
+    print("Tridentix float/string codegen demo")
+
+    let pi = 3.14159
+    print(pi)
+
+    let a = avg(2.0, 4.0)
+    print(a)
+
+    let s = square(3.0)
+    print(s)
+
+    let neg = -s
+    print(neg)
+
+    let flag = not false
+    print(flag)
+
+    let mixed = 2 + 3.5
+    print(mixed)
+
+    let mut total = 0.0
+    loop i in range(0, 4):
+        total = total + 1.5
+
+    print(total)
+    return 42

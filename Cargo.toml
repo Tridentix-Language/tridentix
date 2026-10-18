@@ -1,0 +1,66 @@
+[workspace]
+resolver = "2"
+members = [".", "runtime"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[package]
+name = "tridentix"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Tridentix compiler: lexer, parser, borrow checker, interpreter, optional LLVM 20 codegen"
+
+[features]
+default = []
+# Requires system LLVM 20.1 (llvm-config-20 / LLVM_SYS_201_PREFIX). Off by default so
+# Windows hosts can `cargo build` without a global C++ LLVM install.
+llvm = ["dep:inkwell"]
+
+[lib]
+name = "tridentix"
+path = "compiler/lib.rs"
+crate-type = ["rlib"]
+
+[[bin]]
+name = "tridentix"
+path = "compiler/main.rs"
+
+[[bin]]
+name = "trix"
+path = "compiler/main.rs"
+
+[[bin]]
+name = "pkg"
+path = "compiler/bin/pkg.rs"
+
+[[bin]]
+name = "tridentix-lsp"
+path = "compiler/bin/tridentix-lsp.rs"
+
+[[bench]]
+name = "dispatch_latency"
+harness = false
+path = "benches/dispatch_latency.rs"
+
+[[bench]]
+name = "mailbox_throughput"
+harness = false
+path = "benches/mailbox_throughput.rs"
+
+[dependencies]
+inkwell = { version = "0.10", optional = true, features = ["llvm20-1", "llvm20-1-prefer-dynamic"] }
+regex = "1"
+serde_json = "1"
+toml = "0.7"
+indexmap = "2"
+tower-lsp = "0.19"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+tridentix-runtime = { path = "runtime" }
+
+[dev-dependencies]
+tridentix-runtime = { path = "runtime" }

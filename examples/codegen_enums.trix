@@ -1,0 +1,24 @@
+enum Shape:
+    Circle(radius)
+    Origin
+
+fn classify(s: int) -> int:
+    return s
+
+fn main() -> int:
+    let c = Shape.Circle(42)
+    let o = Shape.Origin
+
+    match c:
+        Shape.Circle(r) => :
+            print(r)
+        Shape.Origin => :
+            print(0)
+
+    match o:
+        Shape.Circle(r) => :
+            print(r)
+        Shape.Origin => :
+            print(999)
+
+    return 0

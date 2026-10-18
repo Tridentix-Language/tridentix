@@ -1,0 +1,46 @@
+import "utils.Tridentix"
+
+fn classify(n: int) -> string:
+    match n:
+        0 => :
+            return "zero"
+        1 => :
+            return "one"
+        _ => :
+            return "many"
+
+fn risky_divide(a: int, b: int) -> int:
+    try:
+        let result = a / b
+        return result
+    catch e:
+        print("caught an error:")
+        print(e)
+        return -1
+
+fn main():
+    # test import
+    let d = double(21)
+    print(d)
+    greet("world")
+
+    # test match (desugars to if/elif/else)
+    print(classify(0))
+    print(classify(1))
+    print(classify(99))
+
+    # test try/catch — division by zero should be caught, not crash
+    let safe = risky_divide(10, 0)
+    print(safe)
+
+    let ok = risky_divide(10, 2)
+    print(ok)
+
+    # test raise + catch
+    try:
+        raise "custom error message"
+    catch e:
+        print("caught raise:")
+        print(e)
+
+    print("all features worked, program completed normally")

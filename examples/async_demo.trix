@@ -1,0 +1,8 @@
+async fn fetch_data(id: int) -> int:
+    print("fetching...")
+    return id * 100
+
+async fn main():
+    let result = await fetch_data(5)
+    print(result)
+    print("async/await worked (note: simplified synchronous model, see README)")

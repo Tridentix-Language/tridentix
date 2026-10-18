@@ -1,0 +1,52 @@
+# Erlang-style one-for-one supervisor: a child crash is intercepted and the actor is restarted.
+
+actor Worker:
+    state:
+        handled: int = 0
+    on receive(msg):
+        if msg == "crash":
+            print("worker: crashing")
+            let bad = tensor([1.0, 2.0])
+            let boom = bad + 1
+            print(boom)
+        elif msg == "ping":
+            handled = handled + 1
+            print("worker: ping")
+            print(handled)
+        else:
+            handled = handled + 1
+            print("worker: ok")
+            print(msg)
+
+actor Logger:
+    state:
+        events: int = 0
+    on receive(msg):
+        events = events + 1
+        print("logger:")
+        print(msg)
+
+fn main():
+    supervisor Root:
+        strategy = one_for_one
+        max_restarts = 3
+        time_window = 60
+        children:
+            spawn Worker() as w1
+            spawn Logger() as log
+
+    send(log, "boot")
+    send(w1, "ping")
+    send(w1, "crash")
+
+    let mut busy = 0
+    loop i in range(0, 400000):
+        busy = busy + 1
+
+    send(w1, "after-restart")
+    send(log, "child recovered")
+
+    loop i in range(0, 400000):
+        busy = busy + 1
+
+    print("actor_supervisor: recovery demonstrated")

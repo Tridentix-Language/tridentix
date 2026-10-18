@@ -1,0 +1,13 @@
+# Tensor demo — exercises the (CPU-only, interpreter-level) tensor
+# builtins. Real GPU-backed tensors need Phase 6+ (LLVM/CUDA) — see
+# the README's "Known Gaps" section.
+
+fn main():
+    let t1 = tensor([1.0, 2.0, 3.0])
+    print(t1)
+
+    let z = tensor.zeros([2, 2])
+    print(z)
+
+    let total = tensor.sum(t1)
+    print(total)

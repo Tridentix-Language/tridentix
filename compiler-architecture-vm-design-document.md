@@ -206,4 +206,4 @@ Compiler flow: is source ko Tier-1 (LLVM IR → native) mein compile karke produ
 
 ---
 
-*Ye document Language Specification Document ke saath milkar poora "Blueprint pair" banata hai — ek batata hai language kaisi dikhti hai, doosra batata hai wo internally kaise chalti hai.*
+

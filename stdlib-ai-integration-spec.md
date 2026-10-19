@@ -172,5 +172,3 @@ fn run_inference(input: tensor):
 5. Python interop error handling — Python exception aane par Tridentix `raise` mein convert ho ya alag `PyException` type ke roop mein propagate ho?
 
 ---
-
-*Teeno documents (Language Spec + Compiler/VM Design + Stdlib/AI Integration) milkar poora foundation blueprint banate hain jisse AI code-generation tool ko diya ja sakta hai.*
